@@ -37,10 +37,10 @@ void setup() {
     Loop though all the pins and set state to low.
     ------------------------------------------------------------------------------------------------------------------
   */
-if (output_invert){
-   this_on = false;
-   this_off = true;
-}
+  if (output_invert){
+    this_on = false;
+    this_off = true;
+  }
 
   for (int this_button = 0; this_button < outputs; this_button++) { // loop though all the buttons
     pinMode(output_pins[this_button], OUTPUT); // set this button as an output
