@@ -16,4 +16,3 @@ const int output_pins[outputs] = {5, 4, 0}; // The output pin number in order
 const String output_names[outputs] = {"Front", "Back", "Side"}; // The name for each button in order
 const int output_durations[outputs] = { 1, 5, 10 }; // The timmer duration for each button in minutes
 const bool output_invert = false; // false =  on is high, off is low; true = on in low, off is high;
-
