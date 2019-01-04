@@ -22,7 +22,7 @@ bool this_off = false;
 */
 const String HTML_response = "HTTP/1.1 200 OK\r\nContent-type:text/html\r\nConnection: close\r\n";
 const String HTML_meta =  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"> \r\n <meta http-equiv=\"refresh\" content=\"10; url=/\"> \r\n <link rel=\"icon\" href=\"data:,\">";
-const String HTML_css =  "<style>  \r\n html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;} \r\n .button { background-color: #56ac6c; border: none; color: white; padding: 16px 40px; min-width:300px; min-height:50px;  text-decoration: none; font-size: 100px; margin: 2px; cursor: pointer;} \r\n .off {background-color: #E67373;} \r\n </style> \r\n";
+const String HTML_css =  "<style>  \r\n html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;} \r\n .button { background-color: #56ac6c; border: none; color: white; padding: 16px 40px; min-width:300px; min-height:50px;  text-decoration: none; font-size: 100px; margin: 2px; cursor: pointer;} \r\n .off {background-color: #E67373;} .smallButton {background-color: #405c80; font-size: 20px; border: none; color: white; padding: 10px 25px;  } \r\n </style> \r\n";
 const String HTML_header =  "<!DOCTYPE html> <html> \n\r <head> \r\n" + HTML_meta + HTML_css + "\r\n </head> \r\n";
 
 // Assign output variables to GPIO pins
@@ -60,7 +60,12 @@ if (output_invert){
   // if it does not connect it starts an access point with the specified name
   // here  "AutoConnectAP"
   // and goes into a blocking loop awaiting configuration
-  wifiManager.autoConnect( (const char *)project_name.c_str());
+   if (!wifiManager.autoConnect( (const char *)project_name.c_str())) {
+    Serial.println("failed to connect, Rebooting System.");
+    delay(20);
+    ESP.reset();
+    delay(5000);
+  }
   // or use this for auto generated name ESP + ChipID
   //wifiManager.autoConnect();
 
@@ -122,6 +127,22 @@ void loop() {
               else if (header.indexOf("GET /" + output_names[this_button] + "/set/off") >= 0) {
                 output_state[this_button] = this_off; // turns the state of the button off
                 Serial.println("Button \"" + output_names[this_button] + "\" is now Off.");
+              }else if (header.indexOf("GET /reset/wifi") >= 0) {
+              	Serial.println("Resetting WiFi.  >.<");
+                WiFiManager wifiManager;
+                wifiManager.resetSettings();
+                // wifiManager.setSTAStaticIPConfig(IP_address, dns, subnet);
+                // if (!wifiManager.startConfigPortal((const char *)project_name.c_str())) {
+      				// Serial.println("failed to connect and hit timeout");
+     				delay(1000);
+      				//reset and try again, or maybe put it to deep sleep
+      				ESP.reset();
+     				delay(5000);
+    			// }
+              }else if (header.indexOf("GET /reboot") >= 0) {
+              	Serial.println("Rebooting System.  >.<");
+      			ESP.reset();
+     			delay(5000);
               }
 
 
@@ -138,6 +159,9 @@ void loop() {
               }
 
             }
+           
+            client.println("<p><a href=\"/reset/wifi\"><button class=\"smallButton\">Reset WiFi</button></a></p>");
+            client.println("<p><a href=\"/reboot\"><button class=\"smallButton\">Reboot</button></a></p>");
 
 
 
